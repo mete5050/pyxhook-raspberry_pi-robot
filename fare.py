@@ -1,69 +1,19 @@
 
 from __future__ import print_function
 
+import RPi.GPIO as GPIO
 import sys
 import re
 import time
 import threading
-import os 
-import RPi.GPIO as GPIO
 
 from Xlib import X, XK, display
 from Xlib.ext import record
 from Xlib.protocol import rq
 
-GPIO.setmode(GPIO.BOARD)
+global yon
+yon="Dur"
 
-global ss1
-global ss2
-global ay1
-global ay2
-global ats
-#Sag-Sol
-ss1=29
-ss2=31
-#############
-#Yukari-Asagi
-ay1=33
-ay2=35
-#############
-ats=37
-#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-GPIO.setup(ss1, GPIO.OUT)
-GPIO.setup(ss2, GPIO.OUT)
-GPIO.setup(ay1, GPIO.OUT)
-GPIO.setup(ay2, GPIO.OUT)
-##########################
-
-'''
-                #Ates et
-                GPIO.output(ats,GPIO.HIGH)
-                ##########################
-                #Ates kes
-                GPIO.output(ats,GPIO.LOW)
-                ##########################
-                #Sag
-                GPIO.output(ss1,GPIO.HIGH)
-                GPIO.output(ss2,GPIO.LOW)
-                ##########################
-                #Sol
-                GPIO.output(ss1,GPIO.LOW)
-                GPIO.output(ss2,GPIO.HIGH)
-                ##########################
-                #Yukari
-                GPIO.output(ay1,GPIO.HIGH)
-                GPIO.output(ay2,GPIO.LOW)
-                ##########################
-                #Asagi
-                GPIO.output(ay1,GPIO.LOW)
-                GPIO.output(ay2,GPIO.HIGH)
-                ##########################
-                
-                
-                
-                
-                
-'''
 class HookManager(threading.Thread):
 
     def __init__(self,parameters=False):
@@ -263,15 +213,45 @@ class HookManager(threading.Thread):
         return self.makemousehookevent(event)
 
     def mousemoveevent(self, event):
+
+
+
         self.mouse_position_x = event.root_x
         self.mouse_position_y = event.root_y 
-        
         xp=event.root_x
         yp=event.root_y
 
         #print(str(xp)+"_"+str(yp))
-        
-        '''
+        GPIO.setmode(GPIO.BOARD)
+	#Sag-Sol
+	ss1=29
+	ss2=31
+	#############
+	#Yukari-Asagi
+	ay1=33
+	ay2=35
+	#############
+	ats=37
+	#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	GPIO.setup(ss1, GPIO.OUT)
+	GPIO.setup(ss2, GPIO.OUT)
+	GPIO.setup(ay1, GPIO.OUT)
+	GPIO.setup(ay2, GPIO.OUT)
+	##########################
+        x=640
+        y=480
+        x1=(x/3)*1
+        x2=(x/3)*2
+        y1=(y/3)*1
+        y2=(y/3)*2
+	
+	'''
+                #Ates et
+                GPIO.output(ats,GPIO.HIGH)
+                ##########################
+                #Ates kes
+                GPIO.output(ats,GPIO.LOW)
+                ##########################
                 #Sag
                 GPIO.output(ss1,GPIO.HIGH)
                 GPIO.output(ss2,GPIO.LOW)
@@ -288,36 +268,70 @@ class HookManager(threading.Thread):
                 GPIO.output(ay1,GPIO.LOW)
                 GPIO.output(ay2,GPIO.HIGH)
                 ##########################
-                #Dur
-                GPIO.output(ss1,GPIO.LOW)
-                GPIO.output(ss2,GPIO.LOW)
-                GPIO.output(ay1,GPIO.LOW)
-                GPIO.output(ay2,GPIO.LOW)
-                ##########################
-        '''
-        
-        
-        if(int(xp)<=455 and int(xp)>=0 ): 
-            if(int(yp)>=0 and int(yp)<=256):
+                
+	'''
+        if(int(xp)<=x1 and int(xp)>=0 ): 
+            if(int(yp)>=0 and int(yp)<=y1):
                 print("Sol ust")
-                #Sol
+                yon ="sol_ust"
+
+        if(int(xp)<=x1 and int(xp)>=0 ): 
+            if(int(yp)>=y1 and int(yp)<=y2):
+                print("Sol")
+                yon ="sol"
+
+        if(int(xp)<=x1 and int(xp)>=0 ): 
+            if(int(yp)>=y2 and int(yp)<=y):
+                print("Sol alt")
+                yon ="sol_alt"
+
+        if(int(xp)<=x2 and int(xp)>=x1 ): 
+            if(int(yp)>=0 and int(yp)<=y1):
+                print("Ust")
+                yon ="ust"
+
+        if(int(xp)<=x2 and int(xp)>=x1 ): 
+            if(int(yp)>=y1 and int(yp)<=y2):
+                print("Dur")
+                yon ="dur"
+
+        if(int(xp)<=x2 and int(xp)>=x1 ): 
+            if(int(yp)>=y2 and int(yp)<=y):
+                print("Alt")
+                yon ="alt"
+
+        if(int(xp)<=x and int(xp)>=x2 ): 
+            if(int(yp)>=0 and int(yp)<=y1):
+                print("Sag ust")
+                yon ="sag_ust"
+
+        if(int(xp)<=x and int(xp)>=x2 ): 
+            if(int(yp)>=y1 and int(yp)<=y2):
+                print("Sag")
+                yon ="sag"
+
+        if(int(xp)<=x and int(xp)>=x2 ): 
+            if(int(yp)>=y2 and int(yp)<=y):
+                print("Sag alt")
+                yon ="sag_alt"
+
+	      if(yon=="sol_ust"):
+		            #Sol
                 GPIO.output(ss1,GPIO.LOW)
                 GPIO.output(ss2,GPIO.HIGH)
                 ##########################
                 GPIO.output(ay1,GPIO.HIGH)
                 GPIO.output(ay2,GPIO.LOW)
                 ##########################
-        if(int(xp)<=455 and int(xp)>=0 ): 
-            if(int(yp)>=256 and int(yp)<=516):
-                print("Sol")
-                #Sol
+
+	      if(yon=="sol"):
+		            #Sol
                 GPIO.output(ss1,GPIO.LOW)
                 GPIO.output(ss2,GPIO.HIGH)
                 ##########################
-        if(int(xp)<=455 and int(xp)>=0 ): 
-            if(int(yp)>=516 and int(yp)<=767):
-                print("Sol alt")
-                #Sol
+
+	      if(yon=="sol_alt"):
+		            #Sol
                 GPIO.output(ss1,GPIO.LOW)
                 GPIO.output(ss2,GPIO.HIGH)
                 ##########################
@@ -325,54 +339,55 @@ class HookManager(threading.Thread):
                 GPIO.output(ay1,GPIO.LOW)
                 GPIO.output(ay2,GPIO.HIGH)
                 ##########################
-        if(int(xp)<=910 and int(xp)>=455 ): 
-            if(int(yp)>=0 and int(yp)<=256):
-                print("Ust")
+
+	      if(yon=="ust"):
+		            print("Ust")
                 #Yukari
                 GPIO.output(ay1,GPIO.HIGH)
                 GPIO.output(ay2,GPIO.LOW)
-                ##########################  
-        if(int(xp)<=910 and int(xp)>=455 ): 
-            if(int(yp)>=256 and int(yp)<=516):
-                print("Dur")
-                #Dur
+                ########################## 
+
+	      if(yon=="dur"):
+		            #Dur
                 GPIO.output(ss1,GPIO.LOW)
                 GPIO.output(ss2,GPIO.LOW)
                 GPIO.output(ay1,GPIO.LOW)
                 GPIO.output(ay2,GPIO.LOW)
                 ##########################
-        if(int(xp)<=910 and int(xp)>=455 ): 
-            if(int(yp)>=516 and int(yp)<=767):
-                print("Alt")
+
+	      if(yon=="alt"):
+		            #Asagi
+                GPIO.output(ay1,GPIO.LOW)
+                GPIO.output(ay2,GPIO.HIGH)
+                ##########################
+
+	      if(yon=="sag_ust"):
+		            #Sag
+                GPIO.output(ss1,GPIO.HIGH)
+                GPIO.output(ss2,GPIO.LOW)
+                ##########################
+
+	      if(yon=="sag"):
+		            #Sag
+                GPIO.output(ss1,GPIO.HIGH)
+                GPIO.output(ss2,GPIO.LOW)
+                ##########################
+
+	      if(yon=="sag_alt"):
+		            #Sag
+                GPIO.output(ss1,GPIO.HIGH)
+                GPIO.output(ss2,GPIO.LOW)
+                ##########################
                 #Asagi
                 GPIO.output(ay1,GPIO.LOW)
                 GPIO.output(ay2,GPIO.HIGH)
                 ##########################
-        if(int(xp)<=1365 and int(xp)>=910 ): 
-            if(int(yp)>=0 and int(yp)<=256):
-                print("Sag ust")
-                #Sag
-                GPIO.output(ss1,GPIO.HIGH)
-                GPIO.output(ss2,GPIO.LOW)
-                ##########################
-        if(int(xp)<=1365 and int(xp)>=910 ): 
-            if(int(yp)>=256 and int(yp)<=516):
-                print("Sag")
-                #Sag
-                GPIO.output(ss1,GPIO.HIGH)
-                GPIO.output(ss2,GPIO.LOW)
-                ##########################
-        if(int(xp)<=1365 and int(xp)>=910 ): 
-            if(int(yp)>=516 and int(yp)<=767):
-                print("Sag alt")
-                #Sag
-                GPIO.output(ss1,GPIO.HIGH)
-                GPIO.output(ss2,GPIO.LOW)
-                ##########################
-                #Asagi
-                GPIO.output(ay1,GPIO.LOW)
-                GPIO.output(ay2,GPIO.HIGH)
-                ##########################
+	      print("yon:"+yon)
+
+
+
+
+	
 
 
         return self.makemousehookevent(event)
@@ -410,9 +425,6 @@ class HookManager(threading.Thread):
         if event.detail == 1:
             MessageName = ""
             print("ates")
-            #Ates et
-            GPIO.output(ats,GPIO.HIGH)
-            ##########################
         elif event.detail == 3:
             MessageName = "mouse right "
         elif event.detail == 2:
@@ -423,16 +435,14 @@ class HookManager(threading.Thread):
             MessageName = "mouse wheel up "
         else:
             MessageName = "mouse {} ".format(event.detail)
-            #Ates kes
-            GPIO.output(ats,GPIO.LOW)
-            ##########################
+
         if event.type == X.ButtonPress:
             MessageName = "{}".format(MessageName)
         elif event.type == X.ButtonRelease:
             MessageName = "{}".format(MessageName)
         
         else:
-            MessageName = "Fare hareket ediyor"
+            MessageName = "mouse moved"
         return pyxhookmouseevent(
             storewm["handle"],
             storewm["name"],
@@ -510,9 +520,9 @@ class pyxhookmouseevent:
             #'Position: {s.Position}',
             'MessageName: {s.MessageName}',
         )).format(s=self)
-        
-        
-        
+
+
+
 if __name__ == '__main__':
     hm = HookManager()
     #hm.HookKeyboard()
